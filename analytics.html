@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - To-Do List{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <div class="analytics-header">
+        <h1>Analytics & Productivity Tracking</h1>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="analytics-overview">
+        <div class="overview-card">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+                <div class="card-value">{{ total_tasks }}</div>
+                <div class="card-label">Total Tasks</div>
+            </div>
+        </div>
+
+        <div class="overview-card">
+            <div class="card-icon">✅</div>
+            <div class="card-content">
+                <div class="card-value">{{ completed_tasks }}</div>
+                <div class="card-label">Completed</div>
+            </div>
+        </div>
+
+        <div class="overview-card">
+            <div class="card-icon">⚠️</div>
+            <div class="card-content">
+                <div class="card-value">{{ overdue_tasks }}</div>
+                <div class="card-label">Overdue</div>
+            </div>
+        </div>
+
+        <div class="overview-card">
+            <div class="card-icon">🎯</div>
+            <div class="card-content">
+                <div class="card-value">{{ progress }}%</div>
+                <div class="card-label">Progress</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="analytics-charts">
+        <!-- Progress Chart -->
+        <div class="chart-card">
+            <h2>Completion Progress</h2>
+            <div class="progress-visualization">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" class="progress-ring-circle-bg"></circle>
+                        <circle cx="60" cy="60" r="50" class="progress-ring-circle" 
+                                style="stroke-dashoffset: {{ 314 * (100 - progress) / 100 }}"></circle>
+                    </svg>
+                    <div class="progress-text">{{ progress }}%</div>
+                </div>
+                <div class="progress-details">
+                    <p><strong>{{ completed_tasks }}</strong> of <strong>{{ total_tasks }}</strong> tasks completed</p>
+                    {% if total_tasks > 0 %}
+                        <p class="progress-estimate">Keep going! You're {{ progress }}% done.</p>
+                    {% else %}
+                        <p class="progress-estimate">Create your first task to get started!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Distribution -->
+        {% if priority_stats %}
+            <div class="chart-card">
+                <h2>Tasks by Priority</h2>
+                <div class="priority-chart">
+                    {% for priority, count in priority_stats %}
+                        <div class="priority-bar">
+                            <div class="bar-label">{{ priority.value.upper() }}</div>
+                            <div class="bar-container">
+                                <div class="bar-fill priority-{{ priority.value }}" 
+                                     style="width: {{ (count / (priority_stats|map(attribute=1)|sum)) * 100 }}%">
+                                    {{ count }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Category Distribution -->
+        {% if category_stats %}
+            <div class="chart-card">
+                <h2>Tasks by Category</h2>
+                <div class="category-chart">
+                    {% for category_name, count in category_stats %}
+                        <div class="category-stat">
+                            <div class="category-name">{{ category_name }}</div>
+                            <div class="category-bar">
+                                <div class="category-fill" 
+                                     style="width: {{ (count / (category_stats|map(attribute=1)|sum)) * 100 }}%">
+                                </div>
+                            </div>
+                            <div class="category-count">{{ count }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Insights -->
+    <div class="analytics-insights">
+        <div class="insights-card">
+            <h2>📈 Insights</h2>
+            <ul class="insights-list">
+                {% if progress >= 80 %}
+                    <li>🎉 Excellent productivity! You've completed {{ progress }}% of your tasks.</li>
+                {% elif progress >= 50 %}
+                    <li>👍 You're making good progress! Keep it up.</li>
+                {% elif progress > 0 %}
+                    <li>⏰ You're on your way. Complete {{ (100 - progress)|int }}% more to finish all tasks.</li>
+                {% else %}
+                    <li>📝 Start by creating a task to begin your productivity journey!</li>
+                {% endif %}
+
+                {% if overdue_tasks > 0 %}
+                    <li>⚠️ You have {{ overdue_tasks }} overdue task{{ 's' if overdue_tasks > 1 else '' }}. Don't forget about them!</li>
+                {% else %}
+                    <li>✅ Great! No overdue tasks. You're on top of things!</li>
+                {% endif %}
+
+                {% if total_tasks == 0 %}
+                    <li>💡 Create your first task to start tracking your productivity.</li>
+                {% elif total_tasks < 5 %}
+                    <li>💪 You have {{ total_tasks }} task{{ 's' if total_tasks > 1 else '' }}. Add more to stay productive!</li>
+                {% else %}
+                    <li>🚀 You're managing {{ total_tasks }} tasks. Great job organizing your work!</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-ring-circle-bg {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 4;
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 314;
+    stroke-dashoffset: 0;
+    transform: rotate(-90deg);
+    transform-origin: 60px 60px;
+    transition: stroke-dashoffset 0.35s;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Create Task - To-Do List{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>Create New Task</h1>
+            <p>Add a new task to your to-do list</p>
+        </div>
+
+        <form method="POST" class="task-form">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }}
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control is-invalid", placeholder="What needs to be done?") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.title(class="form-control", placeholder="What needs to be done?") }}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", placeholder="Add more details (optional)", rows="4") }}
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form.category_id.label(class="form-label") }}
+                    {{ form.category_id(class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.priority.label(class="form-label") }}
+                    {{ form.priority(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form.due_date.label(class="form-label") }}
+                    {{ form.due_date(class="form-control", placeholder="Select date and time", type="datetime-local") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.recurrence.label(class="form-label") }}
+                    {{ form.recurrence(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="form-group checkbox">
+                <label>
+                    {{ form.is_important(class="form-checkbox") }}
+                    Mark as important (⭐)
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Task</button>
+                <a href="{{ url_for('tasks') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

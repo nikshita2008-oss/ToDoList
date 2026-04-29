@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Tags - To-Do List{% endblock %}
+
+{% block content %}
+<div class="tags-container">
+    <div class="tags-header">
+        <h1>Tags</h1>
+        <a href="{{ url_for('create_tag') }}" class="btn btn-primary">+ New Tag</a>
+    </div>
+
+    {% if tags %}
+        <div class="tags-grid">
+            {% for tag in tags %}
+                <div class="tag-card">
+                    <div class="tag-name">{{ tag.name }}</div>
+                    <div class="tag-count">{{ tag.tasks.count() }} task{{ 's' if tag.tasks.count() != 1 else '' }}</div>
+                    <div class="tag-actions">
+                        <a href="{{ url_for('tag_tasks', tag_id=tag.id) }}" class="btn btn-small">View</a>
+                        <form method="POST" action="{{ url_for('delete_tag', tag_id=tag.id) }}" style="display:inline;" 
+                              onsubmit="return confirm('Delete this tag?');">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No tags yet. <a href="{{ url_for('create_tag') }}">Create your first tag!</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - To-Do List{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-header">
+        <h1>Settings</h1>
+    </div>
+
+    <div class="settings-content">
+        <!-- Profile Card -->
+        <div class="settings-section">
+            <div class="section-header">
+                <h2>Profile</h2>
+            </div>
+
+            <div class="profile-card">
+                <div class="profile-info">
+                    <div class="profile-username">{{ current_user.username }}</div>
+                    <div class="profile-email">{{ current_user.email }}</div>
+                    <div class="profile-joined">Joined {{ current_user.created_at.strftime('%B %d, %Y') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preferences -->
+        <div class="settings-section">
+            <div class="section-header">
+                <h2>Preferences</h2>
+            </div>
+
+            <form method="POST" action="{{ url_for('update_settings') }}" class="preferences-form">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group">
+                    {{ form.theme.label(class="form-label") }}
+                    {{ form.theme(class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.timezone.label(class="form-label") }}
+                    {{ form.timezone(class="form-control", placeholder="e.g., UTC, EST, PST") }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Preferences</button>
+            </form>
+        </div>
+
+        <!-- Account -->
+        <div class="settings-section">
+            <div class="section-header">
+                <h2>Account</h2>
+            </div>
+
+            <div class="account-actions">
+                <div class="action-item">
+                    <div class="action-info">
+                        <h3>Logout</h3>
+                        <p>Sign out from your account on this device</p>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="settings-section">
+            <div class="section-header">
+                <h2>Data Management</h2>
+            </div>
+
+            <div class="data-actions">
+                <div class="action-item">
+                    <div class="action-info">
+                        <h3>Export Tasks</h3>
+                        <p>Download all your tasks as JSON</p>
+                    </div>
+                    <a href="{{ url_for('api_export_tasks') }}" class="btn btn-outline">Export</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- About -->
+        <div class="settings-section">
+            <div class="section-header">
+                <h2>About</h2>
+            </div>
+
+            <div class="about-content">
+                <h3>To-Do List Application</h3>
+                <p>A comprehensive task management application built with Flask.</p>
+                <p><strong>Version:</strong> 1.0.0</p>
+                <p><strong>Features:</strong></p>
+                <ul>
+                    <li>Task management with priorities and due dates</li>
+                    <li>Categories and tags for organization</li>
+                    <li>Subtasks for detailed planning</li>
+                    <li>Analytics and productivity tracking</li>
+                    <li>Search and advanced filtering</li>
+                    <li>Dark and light themes</li>
+                    <li>Responsive design for all devices</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - To-Do List{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <a href="{{ url_for('create_task') }}" class="btn btn-primary">+ New Task</a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon completed">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ stats.completed }}</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <path d="M12 1v6m0 6v6"></path>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ stats.total }}</div>
+                <div class="stat-label">Total Tasks</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon overdue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ stats.overdue }}</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon progress">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="2" x2="12" y2="22"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ "%.0f"|format(stats.progress) }}%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+        <h3>Overall Progress</h3>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ stats.progress }}%"></div>
+        </div>
+        <p class="progress-text">{{ stats.completed }} of {{ stats.total }} tasks completed</p>
+    </div>
+
+    <!-- Task Sections -->
+    <div class="dashboard-grid">
+        <!-- Today's Tasks -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Today's Tasks</h2>
+                <a href="{{ url_for('tasks', date='today') }}" class="view-all">View all →</a>
+            </div>
+            {% if today_tasks %}
+                <div class="task-list">
+                    {% for task in today_tasks[:5] %}
+                        <div class="task-item" data-task-id="{{ task.id }}">
+                            <div class="task-checkbox">
+                                <input type="checkbox" class="task-complete" 
+                                       onchange="toggleTask({{ task.id }})">
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">{{ task.title }}</div>
+                                {% if task.due_date %}
+                                    <div class="task-time">{{ task.due_date.strftime('%I:%M %p') }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="task-priority priority-{{ task.priority.value }}">
+                                {{ task.priority.value }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No tasks for today. Great job!</p>
+            {% endif %}
+        </div>
+
+        <!-- Important Tasks -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>⭐ Important Tasks</h2>
+                <a href="{{ url_for('tasks') }}" class="view-all">View all →</a>
+            </div>
+            {% if important_tasks %}
+                <div class="task-list">
+                    {% for task in important_tasks[:5] %}
+                        <div class="task-item important" data-task-id="{{ task.id }}">
+                            <div class="task-checkbox">
+                                <input type="checkbox" class="task-complete" 
+                                       onchange="toggleTask({{ task.id }})" {% if task.is_completed %}checked{% endif %}>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">{{ task.title }}</div>
+                                {% if task.due_date %}
+                                    <div class="task-time">Due: {{ task.due_date.strftime('%a, %b %d') }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="task-priority priority-{{ task.priority.value }}">
+                                {{ task.priority.value }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No important tasks. You're all set!</p>
+            {% endif %}
+        </div>
+
+        <!-- Overdue Tasks -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>⚠️ Overdue Tasks</h2>
+                <a href="{{ url_for('tasks', date='overdue') }}" class="view-all">View all →</a>
+            </div>
+            {% if overdue_tasks %}
+                <div class="task-list">
+                    {% for task in overdue_tasks[:5] %}
+                        <div class="task-item overdue" data-task-id="{{ task.id }}">
+                            <div class="task-checkbox">
+                                <input type="checkbox" class="task-complete" 
+                                       onchange="toggleTask({{ task.id }})">
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">{{ task.title }}</div>
+                                {% if task.due_date %}
+                                    <div class="task-time">Was due: {{ task.due_date.strftime('%a, %b %d') }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="task-priority priority-{{ task.priority.value }}">
+                                {{ task.priority.value }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">No overdue tasks. Keep up the good work!</p>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="dashboard-section quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-grid">
+                <a href="{{ url_for('create_task') }}" class="action-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    New Task
+                </a>
+                <a href="{{ url_for('create_category') }}" class="action-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    New Category
+                </a>
+                <a href="{{ url_for('categories') }}" class="action-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Categories
+                </a>
+                <a href="{{ url_for('analytics') }}" class="action-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="2" x2="12" y2="22"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleTask(taskId) {
+    fetch(`/task/${taskId}/toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              location.reload();
+          }
+      });
+}
+</script>
+{% endblock %}

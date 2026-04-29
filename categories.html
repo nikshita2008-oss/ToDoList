@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Categories - To-Do List{% endblock %}
+
+{% block content %}
+<div class="categories-container">
+    <div class="categories-header">
+        <h1>Categories</h1>
+        <a href="{{ url_for('create_category') }}" class="btn btn-primary">+ New Category</a>
+    </div>
+
+    {% if categories %}
+        <div class="categories-grid">
+            {% for category in categories %}
+                <div class="category-card" style="border-color: {{ category.color }}">
+                    <div class="category-color-bar" style="background-color: {{ category.color }}"></div>
+                    
+                    <div class="category-content">
+                        <h3>{{ category.name }}</h3>
+                        {% if category.description %}
+                            <p class="category-description">{{ category.description }}</p>
+                        {% endif %}
+                        <div class="category-stats">
+                            <span class="stat">{{ category.tasks|length }} task{{ 's' if category.tasks|length != 1 else '' }}</span>
+                            <span class="stat">{{ category.tasks|selectattr('is_completed')|list|length }} completed</span>
+                        </div>
+                    </div>
+
+                    <div class="category-actions">
+                        <a href="{{ url_for('category_tasks', category_id=category.id) }}" class="btn btn-small">View</a>
+                        <a href="{{ url_for('edit_category', category_id=category.id) }}" class="btn btn-small">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_category', category_id=category.id) }}" style="display:inline;" 
+                              onsubmit="return confirm('Are you sure? All tasks in this category will remain but be uncategorized.');">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <p>No categories yet. <a href="{{ url_for('create_category') }}">Create your first category!</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

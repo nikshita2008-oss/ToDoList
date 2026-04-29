@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Create Category - To-Do List{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>Create New Category</h1>
+            <p>Organize your tasks with categories</p>
+        </div>
+
+        <form method="POST" class="category-form">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.name.label(class="form-label") }}
+                {% if form.name.errors %}
+                    {{ form.name(class="form-control is-invalid", placeholder="e.g., Work, Personal") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.name(class="form-control", placeholder="e.g., Work, Personal") }}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", placeholder="Add category description (optional)", rows="3") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.color.label(class="form-label") }}
+                <div class="color-picker-wrapper">
+                    {{ form.color(class="form-control color-picker", type="color") }}
+                    <span class="color-value" id="colorValue">#3498db</span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Category</button>
+                <a href="{{ url_for('categories') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_color').addEventListener('change', function(e) {
+    document.getElementById('colorValue').textContent = e.target.value;
+});
+</script>
+{% endblock %}

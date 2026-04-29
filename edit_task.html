@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task - To-Do List{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1>Edit Task</h1>
+            <p>Update your task information</p>
+        </div>
+
+        <form method="POST" class="task-form">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }}
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.title(class="form-control") }}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", rows="4") }}
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form.category_id.label(class="form-label") }}
+                    {{ form.category_id(class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.priority.label(class="form-label") }}
+                    {{ form.priority(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form.due_date.label(class="form-label") }}
+                    {{ form.due_date(class="form-control", type="datetime-local") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.recurrence.label(class="form-label") }}
+                    {{ form.recurrence(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="form-group checkbox">
+                <label>
+                    {{ form.is_important(class="form-checkbox") }}
+                    Mark as important (⭐)
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update Task</button>
+                <a href="{{ url_for('task_detail', task_id=task.id) }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
